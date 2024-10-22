@@ -10,6 +10,7 @@ const axios = require("axios");
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
 const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
@@ -59,14 +60,42 @@ app.get("/callback", (req, res) => {
 
       // send tokens as JSON response
       res.json({ access_token, refresh_token });
-      console.log("access_token". access_token);
-
-      
+      console.log("access_token", access_token);
     })
     .catch((error) => {
       console.error(error);
       res.send("Error during token exchange");
     });
+});
+
+app.post("/refresh_token", async (req, res) => {
+  try {
+    const { refresh_token } = req.body;
+
+    const authOptions = {
+      url: "https://accounts.spotify.com/api/token",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: "Basic " + Buffer.from(client_id + ":" + client_secret).toString("base64"),
+      },
+      data: querystring.stringify({
+        grant_type: "refresh_token",
+        refresh_token: refresh_token,
+      }),
+    };
+
+    const response = await axios.post(authOptions.url, authOptions.data, { headers: authOptions.headers });
+
+    const { access_token, refresh_token: new_refresh_token } = response.data;
+
+    res.json({
+      access_token: access_token,
+      refresh_token: new_refresh_token || refresh_token,
+    });
+  } catch (error) {
+    console.error("Error refreshing token:", error);
+    res.status(500).send("Failed to refresh token");
+  }
 });
 
 const port = 3000;
