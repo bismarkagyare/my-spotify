@@ -1,6 +1,11 @@
+import { useState } from "react";
+
 const Login = () => {
+  const [loading, setLoading] = useState(false);
+
   const handleLogin = () => {
-    window.location.href = 'http://localhost:3000/login';
+    setLoading(true);
+    window.location.href = "http://localhost:3000/login";
   };
 
   return (
@@ -9,9 +14,11 @@ const Login = () => {
         <h1 className="text-white text-3xl mb-6 font-bold">My Spotify Profile</h1>
         <button
           onClick={handleLogin}
-          className="bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold hover:bg-green-600 transition-all"
+          disabled={loading}
+          className={`bg-green-500 text-white px-6 py-3 rounded-full text-lg font-semibold transition-all
+            ${loading ? "opacity-50 cursor-not-allowed" : "hover:bg-green-600"}`}
         >
-          Log in to Spotify
+          {loading ? "Logging in..." : "Log in to Spotify"}
         </button>
       </div>
     </div>
