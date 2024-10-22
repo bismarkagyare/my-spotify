@@ -1,41 +1,47 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
+import { getUserProfile } from "../services/ApiService";
+import { queryKeys } from "@/lib/queryKeys";
+import { FaSpinner } from "react-icons/fa";
+
+interface UserProfile {
+  id: string;
+  display_name: string;
+  email: string;
+  images: { url: string }[];
+}
 
 const Dashboard = () => {
-  const [userProfile, setUserProfile] = useState<any>(null);
-  const access_token = localStorage.getItem("access_token");
+  const {
+    data: userProfile,
+    isLoading,
+    error,
+  } = useQuery<UserProfile, Error>({
+    queryKey: [queryKeys.USERPROFILE],
+    queryFn: getUserProfile,
+  });
 
-  useEffect(() => {
-    if (access_token) {
-      // Fetch the user's profile information from Spotify
-      axios
-        .get("https://api.spotify.com/v1/me", {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        })
-        .then((response) => {
-          console.log('user data in dashboard', response.data)
-          setUserProfile(response.data); // Set user profile data
-        })
-        .catch((error) => {
-          console.error("Error fetching user profile:", error.message);
-        });
-    }
-  }, [access_token]);
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <FaSpinner className="animate-spin text-4xl text-green-500" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div>Error: {error.message}</div>;
+  }
+
+  if (!userProfile) {
+    return <div>No user data available</div>;
+  }
 
   return (
     <div>
       <h1>Welcome to Your Spotify Dashboard</h1>
-      {userProfile ? (
-        <div>
-          <h2>{userProfile.display_name}</h2>
-          <img src={userProfile.images[0]?.url} alt="Profile" width="200px" />
-          <p>{userProfile.email}</p>
-        </div>
-      ) : (
-        <p>Loading profile...</p>
-      )}
+      <h2>{userProfile.display_name}</h2>
+      {userProfile.images[0] && <img src={userProfile.images[0].url} alt="Profile" width="200" />}
+      <p>Email: {userProfile.email}</p>
     </div>
   );
 };
