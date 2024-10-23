@@ -1,10 +1,9 @@
 import axios, { AxiosInstance } from "axios";
-
-const BASE_URL = "https://api.spotify.com/v1";
+import { BASE_URL } from "@/configs/baseUrl";
 
 const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,
-  //timeout: 100000,
+  timeout: 100000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -40,13 +39,20 @@ api.interceptors.response.use(
         const refreshToken = localStorage.getItem("refresh_token");
         const response = await axios.post("https://localhost:3000/refresh_token", { refreshToken });
 
-        const { access_token } = response.data;
+        const { access_token, refresh_token } = response.data;
 
         localStorage.setItem("access_token", access_token);
+
+        if (refresh_token) {
+          localStorage.setItem("refresh_token", refresh_token);
+        }
+        
         originalRequest.headers["Authorization"] = `Bearer ${access_token}`;
 
         return api(originalRequest);
       } catch (error) {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
         window.location.href = "/login";
         return Promise.reject(error);
       }
