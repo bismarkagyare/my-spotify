@@ -64,7 +64,7 @@ app.get("/callback", (req, res) => {
     })
     .catch((error) => {
       console.error(error);
-      res.send("Error during token exchange");
+      res.status(404).send('Sorry, error occured during exchange');
     });
 });
 
