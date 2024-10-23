@@ -23,7 +23,7 @@ const Dashboard = () => {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <FaSpinner className="animate-spin text-4xl text-green-500" />
+        <FaSpinner className="animate-spin text-5xl text-green-500" />
       </div>
     );
   }
