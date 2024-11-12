@@ -1,12 +1,15 @@
 import axios from "axios";
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const Callback = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { setTokens } = useAuth();
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(location.search);
     const code = params.get("code");
 
     if (code) {
@@ -16,9 +19,8 @@ const Callback = () => {
           console.log("response from server", response.data);
           const { access_token, refresh_token } = response.data;
 
-          localStorage.setItem("access_token", access_token);
-          localStorage.setItem("refresh_token", refresh_token);
-
+          setTokens(access_token, refresh_token);
+          
           navigate("/dashboard");
         })
         .catch((error) => {
@@ -28,13 +30,13 @@ const Callback = () => {
     } else {
       navigate("/login");
     }
-  }, [navigate]);
+  }, [navigate, setTokens, location]);
 
   return (
     <div className="flex h-screen items-center justify-center bg-white/25">
       <div className="flex flex-col space-y-6 items-center">
-        <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-blue-600 border-t-transparent" />
-        <span className="text-center text-gray-700">loading please wait ....</span>
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-green-600 border-t-transparent" />
+        <span className="text-center text-gray-700">Authenticating with Spotify...</span>
       </div>
     </div>
   );
