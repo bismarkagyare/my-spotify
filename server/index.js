@@ -16,7 +16,8 @@ const client_id = process.env.SPOTIFY_CLIENT_ID;
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 const redirect_uri = process.env.SPOTIFY_REDIRECT_URI;
 
-console.log("client_id", client_id);
+console.log("client_id:", client_id);
+console.log("redirect_uri:", redirect_uri)
 
 // step1: redirects user to authorisation page to get auth code
 app.get("/login", (req, res) => {
@@ -64,13 +65,15 @@ app.get("/callback", (req, res) => {
     })
     .catch((error) => {
       console.error(error);
-      res.status(404).send('Sorry, error occured during exchange');
+      //res.status(404).send('Sorry, error occured during exchange');
+      res.send("Error occured during token exchange");
     });
 });
 
-app.post("/refresh_token", async (req, res) => {
+app.get("/refresh_token", async (req, res) => {
   try {
     const { refresh_token } = req.body;
+    //const refresh_token = req.query.refresh_token
 
     const authOptions = {
       url: "https://accounts.spotify.com/api/token",
@@ -78,6 +81,11 @@ app.post("/refresh_token", async (req, res) => {
         "Content-Type": "application/x-www-form-urlencoded",
         Authorization: "Basic " + Buffer.from(client_id + ":" + client_secret).toString("base64"),
       },
+      // form: {
+      //   grant_type: 'refresh_token',
+      //   refresh_token: refresh_token
+      // },
+      // json: true
       data: querystring.stringify({
         grant_type: "refresh_token",
         refresh_token: refresh_token,
@@ -93,8 +101,8 @@ app.post("/refresh_token", async (req, res) => {
       refresh_token: new_refresh_token || refresh_token,
     });
   } catch (error) {
-    console.error("Error refreshing token:", error);
-    res.status(500).send("Failed to refresh token");
+    console.error("Error refreshing token:", error.response?.data || error.message);
+    res.status(401).send("Failed to refresh token");
   }
 });
 
