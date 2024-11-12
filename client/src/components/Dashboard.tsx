@@ -1,47 +1,44 @@
-import { useQuery } from "@tanstack/react-query";
-import { getUserProfile } from "../services/ApiService";
-import { queryKeys } from "@/lib/queryKeys";
-import { FaSpinner } from "react-icons/fa";
-
-interface UserProfile {
-  id: string;
-  display_name: string;
-  email: string;
-  images: { url: string }[];
-}
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Dashboard = () => {
-  const {
-    data: userProfile,
-    isLoading,
-    error,
-  } = useQuery<UserProfile, Error>({
-    queryKey: [queryKeys.USERPROFILE],
-    queryFn: getUserProfile,
-  });
+  const [accessToken, setAccessToken] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <FaSpinner className="animate-spin text-5xl text-green-500" />
-      </div>
-    );
-  }
+  useEffect(() => {
+    const fetchAccessToken = async () => {
+      const code = new URLSearchParams(location.search).get('code');
+  
+      if (code) {
+        try {
+          const response = await axios.get(`http://localhost:3000/callback?code=${code}`);
+          localStorage.setItem('access_token', response.data.access_token); 
+          setAccessToken(response.data.access_token);
+          navigate('/dashboard')
+        } catch (error) {
+          console.error('Error fetching access token:', error);
+          navigate('/login');
+        }
+      } else {
+        navigate('/login');
+      }
+    };
+  
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      setAccessToken(token);
+    } else {
+      fetchAccessToken();
+    }
+  }, [location, navigate]);
 
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
-
-  if (!userProfile) {
-    return <div>No user data available</div>;
-  }
+  if (!accessToken) return <div>Loading...</div>;
 
   return (
     <div>
-      <h1>Welcome to Your Spotify Dashboard</h1>
-      <h2>{userProfile.display_name}</h2>
-      {userProfile.images[0] && <img src={userProfile.images[0].url} alt="Profile" width="200" />}
-      <p>Email: {userProfile.email}</p>
+      <h1>Welcome to your Spotify Dashboard!</h1>
     </div>
   );
 };
