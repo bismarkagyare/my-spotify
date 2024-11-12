@@ -21,7 +21,7 @@ console.log("redirect_uri:", redirect_uri)
 
 // step1: redirects user to authorisation page to get auth code
 app.get("/login", (req, res) => {
-  const scope = "user-read-private user-read-email"; // define the scope of access
+  const scope = "user-read-private user-read-email"; // define the scope of access.
   const state = generateRandomString(16);
   const auth_query_parameters = querystring.stringify({
     response_type: "code",
