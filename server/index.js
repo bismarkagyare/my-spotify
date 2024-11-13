@@ -17,7 +17,7 @@ const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
 const redirect_uri = process.env.SPOTIFY_REDIRECT_URI;
 
 console.log("client_id:", client_id);
-console.log("redirect_uri:", redirect_uri)
+console.log("redirect_uri:", redirect_uri);
 
 // step1: redirects user to authorisation page to get auth code
 app.get("/login", (req, res) => {
