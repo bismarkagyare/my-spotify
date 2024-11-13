@@ -1,40 +1,12 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { useNavigate, useLocation } from "react-router-dom";
+import Loader from "./loader/Loader";
+import useAuth from "@/hooks/useAuth";
 
 const Dashboard = () => {
-  const [accessToken, setAccessToken] = useState("");
-  const navigate = useNavigate();
-  const location = useLocation();
+  const { accessToken, isLoading } = useAuth();
 
-  useEffect(() => {
-    const fetchAccessToken = async () => {
-      const code = new URLSearchParams(location.search).get("code");
+  if (isLoading) return <Loader />;
 
-      if (code) {
-        try {
-          const response = await axios.get(`http://localhost:3000/callback?code=${code}`);
-          localStorage.setItem("access_token", response.data.access_token);
-          setAccessToken(response.data.access_token);
-          navigate("/dashboard");
-        } catch (error) {
-          console.error("Error fetching access token:", error);
-          navigate("/login");
-        }
-      } else {
-        navigate("/login");
-      }
-    };
-
-    const token = localStorage.getItem("access_token");
-    if (token) {
-      setAccessToken(token);
-    } else {
-      fetchAccessToken();
-    }
-  }, [location, navigate]);
-
-  if (!accessToken) return <div>Loading...</div>;
+  if (!accessToken) return null;
 
   return (
     <div>
