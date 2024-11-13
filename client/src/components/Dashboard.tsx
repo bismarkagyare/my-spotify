@@ -1,5 +1,6 @@
 import Loader from "./loader/Loader";
 import useAuth from "@/hooks/useAuth";
+import Layout from "@/layout";
 
 const Dashboard = () => {
   const { accessToken, isLoading } = useAuth();
@@ -8,11 +9,7 @@ const Dashboard = () => {
 
   if (!accessToken) return null;
 
-  return (
-    <div>
-      <h1>Welcome to your Spotify Dashboard!</h1>
-    </div>
-  );
+  return <Layout />;
 };
 
 export default Dashboard;
