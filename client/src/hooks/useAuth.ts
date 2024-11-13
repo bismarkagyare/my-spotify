@@ -1,10 +1,45 @@
-import { AuthContext } from "@/context/AuthContext";
-import { useContext } from "react";
+// src/hooks/useAuth.ts
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate, useLocation } from "react-router-dom";
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}
+const useAuth = () => {
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const fetchAccessToken = async () => {
+      const code = new URLSearchParams(location.search).get("code");
+
+      if (code) {
+        try {
+          const response = await axios.get(`http://localhost:3000/callback?code=${code}`);
+          localStorage.setItem("access_token", response.data.access_token);
+          setAccessToken(response.data.access_token);
+        } catch (error) {
+          console.error("Error fetching access token:", error);
+          navigate("/login");
+        } finally {
+          setIsLoading(false); 
+        }
+      } else {
+        setIsLoading(false);
+        navigate("/login");
+      }
+    };
+
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      setAccessToken(token);
+      setIsLoading(false);
+    } else {
+      fetchAccessToken();
+    }
+  }, [location, navigate]);
+
+  return { accessToken, isLoading };
+};
+
+export default useAuth;
