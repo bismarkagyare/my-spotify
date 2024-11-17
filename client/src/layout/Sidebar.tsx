@@ -11,6 +11,8 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
+import logo from "@/assets/spotify-full-green.png";
+
 // Menu items.
 const items = [
   {
@@ -45,12 +47,14 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>
+            <img src={logo} alt="logo" className="w-[150px] h-full object-contain" />
+          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild className="ml-4">
                     <a href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
