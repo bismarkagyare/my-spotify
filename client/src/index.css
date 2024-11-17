@@ -29,7 +29,7 @@
 
     --sidebar-ring: 217.2 91.2% 59.8%
   }
-  .dark {
+  /* .dark {
 
     --sidebar-background: 240 5.9% 10%;
 
@@ -46,5 +46,17 @@
     --sidebar-border: 240 3.7% 15.9%;
 
     --sidebar-ring: 217.2 91.2% 59.8%
+  } */
+
+  .dark {
+    /* Updated to match Spotify's dark theme */
+    --sidebar-background: 0 0% 12%; /* Spotify's sidebar black */
+    --sidebar-foreground: 0 0% 100%; /* White text */
+    --sidebar-primary: 0 0% 100%;
+    --sidebar-primary-foreground: 0 0% 0%;
+    --sidebar-accent: 0 0% 18%; /* Slightly lighter black for hover states */
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 15%; /* Dark border color */
+    --sidebar-ring: 120 100% 40%;
   }
 }
