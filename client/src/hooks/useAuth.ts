@@ -14,14 +14,14 @@ const useAuth = () => {
 
       if (code) {
         try {
-          const response = await axios.get(`http://localhost:3000/callback?code=${code}`);
+          const response = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/callback?code=${code}`);
           localStorage.setItem("access_token", response.data.access_token);
           setAccessToken(response.data.access_token);
         } catch (error) {
           console.error("Error fetching access token:", error);
           navigate("/login");
         } finally {
-          setIsLoading(false); 
+          setIsLoading(false);
         }
       } else {
         setIsLoading(false);
@@ -38,7 +38,13 @@ const useAuth = () => {
     }
   }, [location, navigate]);
 
-  return { accessToken, isLoading };
+  const logout = () => {
+    localStorage.removeItem("access_token");
+    setAccessToken(null);
+    navigate("/login");
+  };
+
+  return { accessToken, isLoading, logout };
 };
 
 export default useAuth;
