@@ -5,7 +5,8 @@ const Login = () => {
 
   const handleLogin = () => {
     setLoading(true);
-    window.location.replace("http://localhost:3000/login");
+    const loginUrl = process.env.VITE_REACT_APP_API_URL || 'http://localhost:3000';
+    window.location.replace(`${loginUrl}/login`);
   };
 
   return (
