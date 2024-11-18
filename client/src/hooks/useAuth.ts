@@ -11,12 +11,17 @@ const useAuth = () => {
   useEffect(() => {
     const fetchAccessToken = async () => {
       const code = new URLSearchParams(location.search).get("code");
+      console.log("current code", code);
 
       if (code) {
         try {
+          console.log("attempting token exchange... ");
           const response = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/callback?code=${code}`);
+
+          console.log("token exchange successful", response.data);
           localStorage.setItem("access_token", response.data.access_token);
           setAccessToken(response.data.access_token);
+          navigate("/dashboard");
         } catch (error) {
           console.error("Error fetching access token:", error);
           navigate("/login");
