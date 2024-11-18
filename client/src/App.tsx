@@ -1,4 +1,4 @@
-//import "./App.css";
+import "./App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
@@ -16,7 +16,8 @@ function App() {
             <Route path="/" element={<Navigate to={"/login"} />} />
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/callback" element={<Navigate to="/dashboard" />} />
+            <Route path="/callback" element={<Dashboard/>} />
+            {/* <Route path="/callback" element={<Navigate to="/dashboard" />} /> */}
           </Routes>
         </AuthContextProvider>
       </BrowserRouter>
