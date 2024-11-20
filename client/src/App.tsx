@@ -4,6 +4,9 @@ import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { AuthContextProvider } from "./context/AuthContext";
+import { routesArr } from "./routes";
+import { Suspense } from "react";
+import Loader from "./components/loader/Loader";
 
 function App() {
   const queryClient = new QueryClient();
@@ -15,9 +18,21 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to={"/login"} />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/callback" element={<Dashboard/>} />
-            {/* <Route path="/callback" element={<Navigate to="/dashboard" />} /> */}
+            {/* <Route path="/callback" element={<Dashboard />} /> */}
+            <Route path="/callback" element={<Navigate to="/profile" />} />
+            <Route element={<Dashboard />}>
+              {routesArr.map((route) => (
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  element={
+                    <Suspense fallback={<Loader message="Loading..." />}>
+                      <route.element />
+                    </Suspense>
+                  }
+                />
+              ))}
+            </Route>
           </Routes>
         </AuthContextProvider>
       </BrowserRouter>
