@@ -5,7 +5,7 @@ import Layout from "@/layout";
 const Dashboard = () => {
   const { accessToken, isLoading } = useAuth();
 
-  if (isLoading) return <Loader />;
+  if (isLoading) return <Loader message="Authenticating with Spotify..." />;
 
   if (!accessToken) return null;
 

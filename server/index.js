@@ -1,113 +1,156 @@
-const path = require("path");
-require("dotenv").config({ path: path.resolve(__dirname, ".env") });
-
-const { generateRandomString } = require("./utils");
-
 const express = require("express");
 const cors = require("cors");
-const querystring = require("querystring");
 const axios = require("axios");
+const querystring = require("querystring");
+const dotenv = require("dotenv");
+const path = require("path");
+const crypto = require("crypto");
 
+// Load environment variables
+dotenv.config({ path: path.resolve(__dirname, ".env") });
+
+// Function to require environment variables
+const requireEnv = (key) => {
+  const value = process.env[key];
+  if (!value) {
+    throw new Error(`Missing environment variable: ${key}`);
+  }
+  return value;
+};
+
+// Function to generate a secure random state
+const generateState = () => {
+  return crypto.randomBytes(16).toString("hex");
+};
+
+// Function to create Spotify authorization URL
+const createAuthorizationUrl = () => {
+  const clientId = requireEnv("SPOTIFY_CLIENT_ID");
+  const scope = [
+    "user-read-private",
+    "user-read-email",
+    "user-top-read",
+    "user-read-recently-played",
+    "user-library-read",
+    "playlist-read-private",
+    "playlist-read-collaborative",
+    "user-follow-read",
+    "streaming",
+    "user-read-playback-state",
+    "user-modify-playback-state",
+    "user-read-currently-playing",
+  ].join(" ");
+  const state = generateState();
+  const redirectUri = requireEnv("SPOTIFY_REDIRECT_URI");
+
+  const queryParams = querystring.stringify({
+    response_type: "code",
+    client_id: clientId,
+    scope,
+    redirect_uri: redirectUri,
+    state,
+  });
+
+  return `https://accounts.spotify.com/authorize?${queryParams}`;
+};
+
+// Function to exchange authorization code for tokens
+const exchangeCodeForTokens = async (code) => {
+  const clientId = requireEnv("SPOTIFY_CLIENT_ID");
+  const clientSecret = requireEnv("SPOTIFY_CLIENT_SECRET");
+  const redirectUri = requireEnv("SPOTIFY_REDIRECT_URI");
+
+  const authOptions = {
+    url: "https://accounts.spotify.com/api/token",
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    data: {
+      code,
+      redirect_uri: redirectUri,
+      grant_type: "authorization_code",
+    },
+  };
+
+  try {
+    const response = await axios.post(authOptions.url, querystring.stringify(authOptions.data), {
+      headers: authOptions.headers,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Authentication Error:", error.response?.data || error.message);
+    throw new Error("Authentication failed");
+  }
+};
+
+// Function to refresh access token
+const refreshAccessToken = async (refreshToken) => {
+  const clientId = requireEnv("SPOTIFY_CLIENT_ID");
+  const clientSecret = requireEnv("SPOTIFY_CLIENT_SECRET");
+
+  const authOptions = {
+    url: "https://accounts.spotify.com/api/token",
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${clientId}:${clientSecret}`).toString("base64")}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    data: {
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+    },
+  };
+
+  try {
+    const response = await axios.post(authOptions.url, querystring.stringify(authOptions.data), {
+      headers: authOptions.headers,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error refreshing token:", error.response?.data || error.message);
+    throw new Error("Token refresh failed");
+  }
+};
+
+// Express App Setup
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const client_id = process.env.SPOTIFY_CLIENT_ID;
-const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
-const redirect_uri = process.env.SPOTIFY_REDIRECT_URI;
-
-console.log("client_id:", client_id);
-console.log("redirect_uri:", redirect_uri);
-
-// step1: redirects user to authorisation page to get auth code
+// Route to initiate login
 app.get("/login", (req, res) => {
-  const scope = "user-read-private user-read-email"; // define the scope of access.
-  const state = generateRandomString(16);
-  const auth_query_parameters = querystring.stringify({
-    response_type: "code",
-    client_id: client_id,
-    scope: scope,
-    redirect_uri: redirect_uri,
-    state: state,
-  });
-
-  res.redirect(`https://accounts.spotify.com/authorize?${auth_query_parameters}`);
+  const authorizationUrl = createAuthorizationUrl();
+  res.redirect(authorizationUrl);
 });
 
-// step2: callback after spotify authorisation
-app.get("/callback", (req, res) => {
-  const code = req.query.code || null;
-
-  // define options for token request exchange
-  const authOptions = {
-    url: "https://accounts.spotify.com/api/token",
-    form: {
-      code: code,
-      redirect_uri: redirect_uri,
-      grant_type: "authorization_code",
-    },
-    headers: {
-      Authorization: "Basic " + Buffer.from(client_id + ":" + client_secret).toString("base64"),
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  };
-
-  // step3: exchange authorisation code for access_token
-  axios
-    .post(authOptions.url, querystring.stringify(authOptions.form), { headers: authOptions.headers })
-    .then((response) => {
-      const access_token = response.data.access_token;
-      const refresh_token = response.data.refresh_token;
-
-      // send tokens as JSON response
-      res.json({ access_token, refresh_token });
-      console.log("access_token", access_token);
-    })
-    .catch((error) => {
-      console.error(error);
-      //res.status(404).send('Sorry, error occured during exchange');
-      res.send("Error occured during token exchange");
-    });
-});
-
-app.get("/refresh_token", async (req, res) => {
+// Route to handle callback
+app.get("/callback", async (req, res) => {
   try {
-    const { refresh_token } = req.body;
-    //const refresh_token = req.query.refresh_token
-
-    const authOptions = {
-      url: "https://accounts.spotify.com/api/token",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: "Basic " + Buffer.from(client_id + ":" + client_secret).toString("base64"),
-      },
-      // form: {
-      //   grant_type: 'refresh_token',
-      //   refresh_token: refresh_token
-      // },
-      // json: true
-      data: querystring.stringify({
-        grant_type: "refresh_token",
-        refresh_token: refresh_token,
-      }),
-    };
-
-    const response = await axios.post(authOptions.url, authOptions.data, { headers: authOptions.headers });
-
-    const { access_token, refresh_token: new_refresh_token } = response.data;
-
-    res.json({
-      access_token: access_token,
-      refresh_token: new_refresh_token || refresh_token,
-    });
+    const code = req.query.code;
+    const tokens = await exchangeCodeForTokens(code);
+    res.json(tokens);
   } catch (error) {
-    console.error("Error refreshing token:", error.response?.data || error.message);
-    res.status(401).send("Failed to refresh token");
+    res.status(500).json({ error: "Authentication failed" });
   }
 });
 
-const port = 3000;
-
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}.`);
+// Route to refresh token
+app.post("/refresh_token", async (req, res) => {
+  try {
+    const { refresh_token } = req.body;
+    const tokens = await refreshAccessToken(refresh_token);
+    res.json(tokens);
+  } catch (error) {
+    res.status(401).json({ error: "Token refresh failed" });
+  }
 });
+
+// Start the server
+const startServer = (port = 3000) => {
+  app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+  });
+};
+
+// Initialize and start the server
+startServer();

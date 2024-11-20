@@ -48,10 +48,7 @@ const DropdownUser = () => {
         onClick={() => setDropdownOpen(!dropdownOpen)}
         className="flex items-center gap-4"
         to="#"
-      >
-        {/* <span className="hidden text-right lg:block">
-          <span className="block text-base font-medium text-gray-800">AB</span>
-        </span> */}
+      >     
         <AvatarProfile />
 
         <svg

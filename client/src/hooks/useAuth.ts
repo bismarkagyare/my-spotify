@@ -21,7 +21,7 @@ const useAuth = () => {
           console.log("token exchange successful", response.data);
           localStorage.setItem("access_token", response.data.access_token);
           setAccessToken(response.data.access_token);
-          navigate("/dashboard");
+          navigate("/profile");
         } catch (error) {
           console.error("Error fetching access token:", error);
           navigate("/login");
