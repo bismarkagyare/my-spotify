@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import { BASE_URL } from "@/configs/baseUrl";
+import { SpotifyProfile } from "@/types/common";
 
 const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -62,7 +63,7 @@ api.interceptors.response.use(
   }
 );
 
-export const getUserProfile = async () => {
+export const getUserProfile = async (): Promise<SpotifyProfile> => {
   try {
     const response = await api.get("/me");
     return response.data;
