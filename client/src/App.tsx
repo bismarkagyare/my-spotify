@@ -18,8 +18,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to={"/login"} />} />
             <Route path="/login" element={<Login />} />
-            {/* <Route path="/callback" element={<Dashboard />} /> */}
-            <Route path="/callback" element={<Navigate to="/profile" />} />
+            <Route path="/callback" element={<Dashboard />} />
+            {/* <Route path="/callback" element={<Navigate to="/profile" />} /> */}
             <Route element={<Dashboard />}>
               {routesArr.map((route) => (
                 <Route

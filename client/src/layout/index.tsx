@@ -7,12 +7,12 @@ export default function Layout() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   return (
-    <section className="bg-slate-100">
+    <section className="bg-[#191414]">
       <div className="flex h-screen overflow-hidden">
         <Sidebar isDrawerOpen={isDrawerOpen} setIsDrawerOpen={setIsDrawerOpen} />
         <section className="relative flex flex-col flex-1 overflow-x-hidden overflow-y-auto">
           <Header isDrawerOpen={isDrawerOpen} setIsDrawerOpen={setIsDrawerOpen} />
-          <main className="min-h-[100vh-200px]">
+          <main className="min-h-[100vh-200px] bg-[#191414] ">
             <div className="mx-auto max-w-screen-2xl md:p-6">
               <Outlet />
             </div>
