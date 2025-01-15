@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 import { BASE_URL } from "@/configs/baseUrl";
-import { SpotifyProfile } from "@/types/common";
+import { SpotifyArtist, SpotifyPlaylist, SpotifyProfile, SpotifyTrack } from "@/types/common";
 
 const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,
@@ -69,6 +69,56 @@ export const getUserProfile = async (): Promise<SpotifyProfile> => {
     return response.data;
   } catch (error) {
     console.error("Error fetching user data", error);
+    throw error;
+  }
+};
+
+export const getUserPlaylists = async (): Promise<SpotifyPlaylist[]> => {
+  try {
+    const response = await api.get("/me/playlists");
+    return response.data.items;
+  } catch (error) {
+    console.error("Error fetching user playlists:", error);
+    throw error;
+  }
+};
+
+export const getFollowedArtists = async (): Promise<SpotifyArtist[]> => {
+  try {
+    const response = await api.get("/me/following?type=artist");
+    return response.data.artists.items;
+  } catch (error) {
+    console.error("Error fetching followed artists:", error);
+    throw error;
+  }
+};
+
+// export const getTopTracks = async (timeRange: string = "medium_term"): Promise<any> => {
+//   try {
+//     const response = await api.get(`/me/top/tracks?time_range=${timeRange}`);
+//     return response.data.items;
+//   } catch (error) {
+//     console.error("Error fetching top tracks:", error);
+//     throw error;
+//   }
+// };
+
+export const getTopArtists = async (timeRange: string = "long_term"): Promise<SpotifyTrack[]> => {
+  try {
+    const response = await api.get(`/me/top/artists?time_range=${timeRange}`);
+    return response.data.items;
+  } catch (error) {
+    console.error("Error fetching top artists:", error);
+    throw error;
+  }
+};
+
+export const getTopTracks = async (timeRange: string): Promise<SpotifyTrack[]> => {
+  try {
+    const response = await api.get(`/me/top/tracks?time_range=${timeRange}`);
+    return response.data.items;
+  } catch (error) {
+    console.error("Error fetching top tracks:", error);
     throw error;
   }
 };
