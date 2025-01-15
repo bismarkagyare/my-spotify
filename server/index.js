@@ -1,4 +1,3 @@
-
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
@@ -13,11 +12,11 @@ const __dirname = dirname(__filename);
 // Load environment variables
 dotenv.config({ path: path.join(__dirname, ".env") });
 
-console.log("ENV file path:", path.join(__dirname, '.env'));
+console.log("ENV file path:", path.join(__dirname, ".env"));
 console.log("Environment variables loaded:", {
   SPOTIFY_CLIENT_ID: process.env.SPOTIFY_CLIENT_ID,
   HAS_SECRET: !!process.env.SPOTIFY_CLIENT_SECRET,
-  REDIRECT_URI: process.env.SPOTIFY_REDIRECT_URI
+  REDIRECT_URI: process.env.SPOTIFY_REDIRECT_URI,
 });
 
 // Express App Setup
