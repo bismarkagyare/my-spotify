@@ -18,11 +18,42 @@ export interface SpotifyProfile {
   id: string;
   images: { url: string }[];
   followers: { total: number };
-  following: number;
-  playlists: number;
+  following?: number;
+  playlists?: number;
 }
 export interface SpotifyImage {
   url: string;
   height: number | null;
   width: number | null;
+}
+
+export interface SpotifyPlaylist {
+  name: string;
+  id: string;
+  tracks: {
+    total: number;
+  };
+}
+
+export interface SpotifyArtist {
+  name: string;
+  id: string;
+}
+
+
+export interface SpotifyTrack {
+  id: string;
+  name: string;
+  duration_ms: number;
+  album: {
+    name: string;
+    images: Array<{
+      url: string;
+      height: number;
+      width: number;
+    }>;
+  };
+  artists: Array<{
+    name: string;
+  }>;
 }
