@@ -93,16 +93,6 @@ export const getFollowedArtists = async (): Promise<SpotifyArtist[]> => {
   }
 };
 
-// export const getTopTracks = async (timeRange: string = "medium_term"): Promise<any> => {
-//   try {
-//     const response = await api.get(`/me/top/tracks?time_range=${timeRange}`);
-//     return response.data.items;
-//   } catch (error) {
-//     console.error("Error fetching top tracks:", error);
-//     throw error;
-//   }
-// };
-
 export const getTopArtists = async (timeRange: string = "long_term"): Promise<SpotifyTrack[]> => {
   try {
     const response = await api.get(`/me/top/artists?time_range=${timeRange}`);
