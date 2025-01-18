@@ -3,4 +3,7 @@ export const queryKeys = {
   USERPLAYLISTS: "userPlaylists",
   FOLLOWEDARTISTS: "followedArtists",
   TOPTRACKS: "topTracks",
+  RECENTLYPLAYEDARTISTS: "recentlyPlayedArtists",
+  RECENTLYPLAYEDTRACKS: "recentlyPlayedTracks",
+  TOPARTISTS: "topArtists",
 };
