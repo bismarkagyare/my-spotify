@@ -48,8 +48,6 @@ const Profile = () => {
     queryFn: () => getTopTracks("long_term"), // Fetch top tracks of all time
   });
 
-  console.log("user profile data:", profile);
-  console.log("user playlists data:", playlists);
   console.log("followed artists data:", followedArtists);
   console.log("top tracks data:", topTracks);
 
