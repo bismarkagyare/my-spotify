@@ -17,6 +17,7 @@ const useAuth = () => {
         try {
           console.log("attempting token exchange... ");
           const response = await axios.get(`${import.meta.env.VITE_REACT_APP_API_URL}/callback?code=${code}`);
+          //const response = await axios.post("http://localhost:3000/callback", { code });
 
           console.log("token exchange successful", response.data);
           localStorage.setItem("access_token", response.data.access_token);
