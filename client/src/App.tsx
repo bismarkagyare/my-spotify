@@ -8,6 +8,7 @@ import { routesArr } from "./routes";
 import { Suspense } from "react";
 import Loader from "./components/loader/Loader";
 
+
 function App() {
   const queryClient = new QueryClient();
 
