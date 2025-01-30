@@ -1,19 +1,8 @@
 import crypto from "crypto";
 import querystring from "querystring";
 import axios from "axios";
-// import dotenv from "dotenv";
-// import path from "path";
-// import { fileURLToPath } from 'url';
-// import { dirname } from 'path';
 
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = dirname(__filename);
-
-
-// // Load environment variables
-// dotenv.config({ path: path.join(__dirname, "../../.env") });
-
-// Function to require environment variables
+// function to require environment variables
 const requireEnv = (key) => {
   const value = process.env[key];
   if (!value) {
@@ -22,12 +11,12 @@ const requireEnv = (key) => {
   return value;
 };
 
-// Generate a secure random state
+// generate a secure random state
 export const generateState = () => {
   return crypto.randomBytes(16).toString("hex");
 };
 
-// Create Spotify authorization URL
+// create Spotify authorization URL
 export const createAuthorizationUrl = () => {
   const clientId = requireEnv("SPOTIFY_CLIENT_ID");
   const scope = [
@@ -58,7 +47,7 @@ export const createAuthorizationUrl = () => {
   return `https://accounts.spotify.com/authorize?${queryParams}`;
 };
 
-// Exchange authorization code for tokens
+// exchange authorization code for tokens
 export const exchangeCodeForTokens = async (code) => {
   const clientId = requireEnv("SPOTIFY_CLIENT_ID");
   const clientSecret = requireEnv("SPOTIFY_CLIENT_SECRET");
@@ -84,7 +73,7 @@ export const exchangeCodeForTokens = async (code) => {
     return response.data;
   } catch (error) {
     console.error("Authentication Error:", error.response?.data || error.message);
-    throw new Error("Authentication failed");
+    throw new Error("Exchange of tokens failed");
   }
 };
 
